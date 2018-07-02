@@ -6,7 +6,7 @@ use yii\base\Model;
 use yii\queue\RetryableJobInterface;
 
 /**
- * Class BaseJob
+ * Class RetryableJob
  * @property $messageProperties
  * @property $ttr
  * @property $attempts
@@ -23,10 +23,10 @@ class RetryableJob extends Model implements RetryableJobInterface
     const EVENT_BEFORE_PROCESS = 'beforeProcess';
     const EVENT_AFTER_PROCESS = 'afterProcess';
 
-    private $_attempts = self::ATTEMPTS;
-    private $_ttr = self::TTR;
-    private $_retry_delay = self::RETRY_DELAY;
-    private $_retry_progression = Queue::ARITHMETIC_PROGRESSION;
+    protected $_attempts = self::ATTEMPTS;
+    protected $_ttr = self::TTR;
+    protected $_retry_delay = self::RETRY_DELAY;
+    protected $_retry_progression = Queue::ARITHMETIC_PROGRESSION;
 
     public function rules(): array
     {

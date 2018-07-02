@@ -6,6 +6,10 @@ use Interop\Amqp\AmqpMessage;
 use Interop\Amqp\AmqpProducer;
 use yii\queue\amqp_interop\Queue as BaseQueue;
 
+/**
+ * Class Queue
+ * @package semsty\amqp
+ */
 class Queue extends BaseQueue
 {
     const RETRY_DELAY = 'retry-delay';
