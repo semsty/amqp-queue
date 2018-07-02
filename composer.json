@@ -32,11 +32,5 @@
         "psr-4": {
             "semsty\\amqp\\": "src"
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "master",
-            "dev-develop": "develop"
-        }
     }
 }
