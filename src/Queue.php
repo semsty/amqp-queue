@@ -1,6 +1,6 @@
 <?php
 
-namespace common\core\queue;
+namespace semsty\amqp;
 
 use Interop\Amqp\AmqpMessage;
 use Interop\Amqp\AmqpProducer;
