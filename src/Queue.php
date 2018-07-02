@@ -14,6 +14,14 @@ class Queue extends BaseQueue
     const ARITHMETIC_PROGRESSION = 'arithmetic';
     const GEOMETRIC_PROGRESSION = 'geometric';
 
+    public static function getProgressionTypes(): array
+    {
+        return [
+            static::ARITHMETIC_PROGRESSION,
+            static::GEOMETRIC_PROGRESSION
+        ];
+    }
+
     /**
      * @param AmqpMessage $message
      * @throws \Interop\Queue\DeliveryDelayNotSupportedException
@@ -23,7 +31,7 @@ class Queue extends BaseQueue
      */
     protected function redeliver(AmqpMessage $message)
     {
-        $attempt = $message->getProperty(self::ATTEMPT, 1);
+        $attempt = $message->getProperty(static::ATTEMPT, 1);
         $body = $this->serializer->unserialize($message->getBody());
         $newMessage = $this->context->createMessage($message->getBody(), $message->getProperties(), $message->getHeaders());
         $newMessage->setDeliveryMode($message->getDeliveryMode());
@@ -37,13 +45,13 @@ class Queue extends BaseQueue
     }
 
     /**
-     * @param $body
+     * @param array $body
      * @param AmqpProducer $producer
      * @param AmqpMessage $newMessage
-     * @param $attempt
+     * @param int $attempt
      * @throws \Interop\Queue\DeliveryDelayNotSupportedException
      */
-    public function processDelay($body, AmqpProducer $producer, AmqpMessage $newMessage, $attempt)
+    public function processDelay(array $body, AmqpProducer &$producer, AmqpMessage &$newMessage, int $attempt)
     {
         if (array_key_exists('messageProperties', $body)) {
             $messageProperties = $body['messageProperties'];
@@ -56,7 +64,7 @@ class Queue extends BaseQueue
                         $retryDelay = pow($retryDelay, $attempt);
                         break;
                 }
-                $newMessage->setProperty(self::DELAY, $retryDelay);
+                $newMessage->setProperty(static::DELAY, $retryDelay);
                 $producer->setDeliveryDelay($retryDelay * 1000);
             }
         }
