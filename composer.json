@@ -3,7 +3,6 @@
     "description": "yii amqp queue with support delayed restart, etc.",
     "keywords": ["yii", "amqp", "queue"],
     "type": "project",
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Semen Khristy",
@@ -32,6 +31,12 @@
     "autoload": {
         "psr-4": {
             "semsty\\amqp\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "master",
+            "dev-develop": "develop"
         }
     }
 }
