@@ -16,33 +16,52 @@ use yii\queue\RetryableJobInterface;
  */
 class RetryableJob extends Model implements RetryableJobInterface
 {
+    /**
+     * Default attempts
+     */
     const ATTEMPTS = 1;
+
+    /**
+     * Default TTR
+     */
     const TTR = 60;
+
+    /**
+     * Default retry delay
+     */
     const RETRY_DELAY = 0;
 
     const EVENT_BEFORE_PROCESS = 'beforeProcess';
     const EVENT_AFTER_PROCESS = 'afterProcess';
 
-    protected $_attempts = self::ATTEMPTS;
-    protected $_ttr = self::TTR;
-    protected $_retry_delay = self::RETRY_DELAY;
+    protected $_attempts;
+    protected $_ttr;
+    protected $_retry_delay;
     protected $_retry_progression = Queue::ARITHMETIC_PROGRESSION;
 
     public function rules(): array
     {
         return [
             [['messageProperties', 'ttr', 'attempts', 'retryDelay', 'retryProgression'], 'safe'],
-            ['retryProgression', 'in', 'range' => Queue::getProgressionTypes()]
+            ['retryProgression', 'in', 'range' => Queue::getProgressionTypes()],
         ];
     }
 
     public function init()
     {
         parent::init();
+        if (!$this->_attempts) {
+            $this->_attempts = static::ATTEMPTS;
+        }
+        if (!$this->_ttr) {
+            $this->_ttr = static::TTR;
+        }
+        if (!$this->_retry_delay) {
+            $this->_retry_delay = static::RETRY_DELAY;
+        }
         $this->on(static::EVENT_BEFORE_PROCESS, [$this, 'beforeProcess']);
         $this->on(static::EVENT_AFTER_PROCESS, [$this, 'afterProcess']);
     }
-
 
     public function getMessageProperties(): array
     {
