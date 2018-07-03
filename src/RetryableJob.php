@@ -12,7 +12,7 @@ use yii\queue\RetryableJobInterface;
  * @property $attempts
  * @property $retryDelay
  * @property $retryProgression
- * @package console\models\tasks
+ * @package semsty\amqp
  */
 class RetryableJob extends Model implements RetryableJobInterface
 {

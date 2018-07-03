@@ -1,0 +1,7 @@
+/.idea
+/.git
+/.dockerignore
+/.gitignore
+/composer.lock
+/tests/app/runtime
+/vendor
