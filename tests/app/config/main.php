@@ -15,6 +15,11 @@ $config = [
             'password' => getenv('RABBITMQ_PASSWORD') ?: 'guest',
             'queueName' => 'queue-interop',
             'exchangeName' => 'exchange-interop',
+            'driver' => \semsty\amqp\Queue::ENQUEUE_AMQP_LIB,
+            'as log' => \yii\queue\LogBehavior::class,
+            'readTimeout' => 60,
+            'writeTimeout' => 60,
+            'heartbeat' => 30
         ]
     ],
 ];

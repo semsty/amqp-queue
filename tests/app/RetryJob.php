@@ -15,7 +15,7 @@ class RetryJob extends RetryableJob
 
     public function process()
     {
-        if ($this->first_run_failure && $this->attempts > 1) {
+        if ($this->first_run_failure && $this->isFirstExecute()) {
             throw new \Exception('Planned error.');
         }
         file_put_contents($this->getFileName(), 'a', FILE_APPEND);

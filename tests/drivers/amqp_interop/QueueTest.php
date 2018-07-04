@@ -35,7 +35,7 @@ class QueueTest extends CliTestCase
 
         sleep(10);
         $this->assertFileExists($job->getFileName());
-        $this->assertEquals('aa', file_get_contents($job->getFileName()));
+        $this->assertEquals('a', file_get_contents($job->getFileName()));
     }
 
 

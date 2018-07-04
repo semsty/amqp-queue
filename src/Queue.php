@@ -40,7 +40,14 @@ class Queue extends BaseQueue
     {
         $attempt = $message->getProperty(static::ATTEMPT, 1);
         $body = $this->serializer->unserialize($message->getBody());
-        $newMessage = $this->context->createMessage($message->getBody(), $message->getProperties(), $message->getHeaders());
+        if ($body instanceof RetryableJob) {
+            $body->currentAttempt = $attempt + 1;
+        }
+        $newMessage = $this->context->createMessage(
+            $this->serializer->serialize($body),
+            $message->getProperties(),
+            $message->getHeaders()
+        );
         $newMessage->setDeliveryMode($message->getDeliveryMode());
         $producer = $this->context->createProducer();
         if ($body instanceof RetryableJob) {

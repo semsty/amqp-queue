@@ -10,6 +10,7 @@ use yii\queue\RetryableJobInterface;
  * @property $messageProperties
  * @property $ttr
  * @property $attempts
+ * @property $currentAttempt
  * @property $retryDelay
  * @property $retryProgression
  * @package semsty\amqp
@@ -34,6 +35,7 @@ class RetryableJob extends Model implements RetryableJobInterface
     const EVENT_BEFORE_PROCESS = 'beforeProcess';
     const EVENT_AFTER_PROCESS = 'afterProcess';
 
+    protected $_current_attempt;
     protected $_attempts;
     protected $_ttr;
     protected $_retry_delay;
@@ -42,7 +44,7 @@ class RetryableJob extends Model implements RetryableJobInterface
     public function rules(): array
     {
         return [
-            [['messageProperties', 'ttr', 'attempts', 'retryDelay', 'retryProgression'], 'safe'],
+            [['messageProperties', 'ttr', 'attempts', 'retryDelay', 'retryProgression', 'currentAttempt'], 'safe'],
             ['retryProgression', 'in', 'range' => Queue::getProgressionTypes()],
         ];
     }
@@ -58,6 +60,9 @@ class RetryableJob extends Model implements RetryableJobInterface
         }
         if (!$this->_retry_delay) {
             $this->_retry_delay = static::RETRY_DELAY;
+        }
+        if (!$this->_current_attempt) {
+            $this->_current_attempt = 1;
         }
         $this->on(static::EVENT_BEFORE_PROCESS, [$this, 'beforeProcess']);
         $this->on(static::EVENT_AFTER_PROCESS, [$this, 'afterProcess']);
@@ -106,6 +111,21 @@ class RetryableJob extends Model implements RetryableJobInterface
     public function setAttempts(int $value)
     {
         $this->_attempts = $value;
+    }
+
+    public function getCurrentAttempt(): int
+    {
+        return $this->_current_attempt;
+    }
+
+    public function setCurrentAttempt(int $value)
+    {
+        $this->_current_attempt = $value;
+    }
+
+    public function isFirstExecute(): bool
+    {
+        return $this->currentAttempt == 1;
     }
 
     public function getRetryDelay(): int
