@@ -82,4 +82,17 @@ class Queue extends BaseQueue
             $producer->setDeliveryDelay($retryDelay * 1000);
         }
     }
+    
+    public function count()
+    {
+        $this->open();
+        if ($this->setupBrokerDone) {
+            return;
+        }
+        $queue = $this->context->createQueue($this->queueName);
+        $queue->addFlag(AmqpQueue::FLAG_DURABLE);
+        $queue->setArguments(['x-max-priority' => $this->maxPriority]);
+        return $this->context->declareQueue($queue);
+
+    }
 }
