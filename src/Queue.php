@@ -2,6 +2,7 @@
 
 namespace semsty\amqp;
 
+use Interop\Amqp\AmqpQueue;
 use Interop\Amqp\AmqpMessage;
 use Interop\Amqp\AmqpProducer;
 use yii\queue\amqp_interop\Queue as BaseQueue;
