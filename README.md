@@ -1,0 +1,1 @@
+AMQP-queue with supports delayed retry with [DLX](https://www.rabbitmq.com/dlx.html)
