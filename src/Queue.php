@@ -4,6 +4,7 @@ namespace semsty\amqp;
 
 use Interop\Amqp\AmqpMessage;
 use Interop\Amqp\AmqpProducer;
+use Interop\Amqp\AmqpQueue;
 use yii\queue\amqp_interop\Queue as BaseQueue;
 
 /**
@@ -81,5 +82,14 @@ class Queue extends BaseQueue
             $newMessage->setProperty(static::DELAY, $retryDelay);
             $producer->setDeliveryDelay($retryDelay * 1000);
         }
+    }
+
+    public function count()
+    {
+        $this->open();
+        $queue = $this->context->createQueue($this->queueName);
+        $queue->addFlag(AmqpQueue::FLAG_DURABLE);
+        $queue->setArguments(['x-max-priority' => $this->maxPriority]);
+        return $this->context->declareQueue($queue);
     }
 }
