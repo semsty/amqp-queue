@@ -2,6 +2,7 @@
 
 namespace semsty\amqp;
 
+use yii\base\ErrorException;
 use yii\base\Model;
 use yii\queue\RetryableJobInterface;
 
@@ -40,6 +41,8 @@ class RetryableJob extends Model implements RetryableJobInterface
     protected $_ttr;
     protected $_retry_delay;
     protected $_retry_progression = Queue::ARITHMETIC_PROGRESSION;
+    protected $_priority = 0;
+    protected $_delay = 0;
 
     public function rules(): array
     {
@@ -156,5 +159,32 @@ class RetryableJob extends Model implements RetryableJobInterface
     public function afterProcess()
     {
 
+    }
+
+    public function getQueueName()
+    {
+        return 'queue';
+    }
+
+    public function priority(int $value)
+    {
+        $this->_priority = $value;
+        return $this;
+    }
+
+    public function delay(int $value)
+    {
+        $this->_delay = $value;
+        return $this;
+    }
+
+    public function push($queueName = null)
+    {
+        $queueComponent = $queueName ? $queueName : static::getQueueName();
+        if (!isset(\Yii::$app->$queueComponent)) {
+            throw new ErrorException("$queueComponent does not set");
+        }
+        $id = \Yii::$app->$queueComponent->delay($this->_delay)->priority($this->_priority)->push($this);
+        return $id;
     }
 }
