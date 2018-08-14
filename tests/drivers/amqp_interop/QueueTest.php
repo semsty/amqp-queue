@@ -12,7 +12,7 @@ class QueueTest extends CliTestCase
     {
         $this->startProcess('php yii queue/listen');
         $job = new RetryJob(['uid' => uniqid()]);
-        $this->getQueue()->push($job);
+        $job->push('amqpInteropQueue');
 
         sleep(6);
         $this->assertFileExists($job->getFileName());
@@ -28,7 +28,7 @@ class QueueTest extends CliTestCase
             'attempts' => 2,
             'first_run_failure' => true
         ]);
-        $this->getQueue()->push($job);
+        $job->push('amqpInteropQueue');
 
         sleep(6);
         $this->assertFileNotExists($job->getFileName());
