@@ -99,19 +99,14 @@ class RetryableJob extends Model implements RetryableJobInterface
 
     }
 
-    public function setId($value)
-    {
-        $this->_id = $value;
-    }
-
     public function getId()
     {
         return $this->_id;
     }
 
-    public function setPreviousId($value)
+    public function setId($value)
     {
-        $this->_previous_id = $value;
+        $this->_id = $value;
     }
 
     public function getPreviousId()
@@ -119,24 +114,19 @@ class RetryableJob extends Model implements RetryableJobInterface
         return $this->_previous_id;
     }
 
-    public function setQueueName($value)
+    public function setPreviousId($value)
     {
-        $this->_queue_name = $value;
-    }
-
-    public function getQueueName()
-    {
-        return $this->_queue_name;
-    }
-
-    public function setTtr(int $value)
-    {
-        $this->_ttr = $value;
+        $this->_previous_id = $value;
     }
 
     public function getTtr(): int
     {
         return $this->_ttr;
+    }
+
+    public function setTtr(int $value)
+    {
+        $this->_ttr = $value;
     }
 
     public function canRetry($attempt, $error)
@@ -219,6 +209,16 @@ class RetryableJob extends Model implements RetryableJobInterface
         }
         $id = \Yii::$app->$queueComponent->delay($this->_delay)->priority($this->_priority)->push($this);
         return $id;
+    }
+
+    public function getQueueName()
+    {
+        return $this->_queue_name;
+    }
+
+    public function setQueueName($value)
+    {
+        $this->_queue_name = $value;
     }
 
     public function getRetryMap()
