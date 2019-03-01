@@ -12,6 +12,8 @@ RUN apt-get update \
     && pecl install igbinary \
     && docker-php-ext-enable igbinary \
     && docker-php-ext-install bcmath \
+    && apt-get install -y libsodium-dev \
+    && docker-php-ext-install sodium \
     && docker-php-ext-install pdo_mysql \
     && apt-get install -y libpq-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \

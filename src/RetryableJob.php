@@ -2,12 +2,17 @@
 
 namespace semsty\amqp;
 
+use semsty\amqp\progression\Arithmetic;
+use semsty\amqp\progression\BaseProgression;
 use yii\base\ErrorException;
 use yii\base\Model;
 use yii\queue\RetryableJobInterface;
 
 /**
  * Class RetryableJob
+ * @property $id
+ * @property $previousId
+ * @property $queueName
  * @property $messageProperties
  * @property $ttr
  * @property $attempts
@@ -40,9 +45,12 @@ class RetryableJob extends Model implements RetryableJobInterface
     protected $_attempts;
     protected $_ttr;
     protected $_retry_delay;
-    protected $_retry_progression = Queue::ARITHMETIC_PROGRESSION;
+    protected $_retry_progression = Arithmetic::NAME;
     protected $_priority = 0;
     protected $_delay = 0;
+    protected $_id;
+    protected $_previous_id;
+    protected $_queue_name = 'queue';
 
     public function rules(): array
     {
@@ -89,6 +97,36 @@ class RetryableJob extends Model implements RetryableJobInterface
     public function process()
     {
 
+    }
+
+    public function setId($value)
+    {
+        $this->_id = $value;
+    }
+
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    public function setPreviousId($value)
+    {
+        $this->_previous_id = $value;
+    }
+
+    public function getPreviousId()
+    {
+        return $this->_previous_id;
+    }
+
+    public function setQueueName($value)
+    {
+        $this->_queue_name = $value;
+    }
+
+    public function getQueueName()
+    {
+        return $this->_queue_name;
     }
 
     public function setTtr(int $value)
@@ -161,11 +199,6 @@ class RetryableJob extends Model implements RetryableJobInterface
 
     }
 
-    public function getQueueName()
-    {
-        return 'queue';
-    }
-
     public function priority(int $value)
     {
         $this->_priority = $value;
@@ -186,5 +219,11 @@ class RetryableJob extends Model implements RetryableJobInterface
         }
         $id = \Yii::$app->$queueComponent->delay($this->_delay)->priority($this->_priority)->push($this);
         return $id;
+    }
+
+    public function getRetryMap()
+    {
+        $class = BaseProgression::getClassesByName()[$this->retryProgression];
+        return $class::getMap($this->retryDelay, $this->attempts);
     }
 }
