@@ -6,8 +6,8 @@ class DecimalLogarithmic extends BaseProgression
 {
     const NAME = 'decimal-logarithmic';
 
-    public static function calculate($delay, $attempt)
+    public static function calculate($delay, $attempt): int
     {
-        return log10($attempt) * $delay;
+        return (integer)ceil(log10($attempt) * $delay);
     }
 }

@@ -47,7 +47,7 @@ abstract class BaseProgression extends BaseObject
         return $retries;
     }
 
-    public static function calculate($delay, $attempt)
+    public static function calculate($delay, $attempt): int
     {
         return $delay;
     }

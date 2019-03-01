@@ -25,45 +25,14 @@ class Queue extends BaseQueue
     public function init()
     {
         parent::init();
-        $this->on(static::EVENT_BEFORE_EXEC, function (ExecEvent $event) {
-            if ($event->job instanceof RetryableJob) {
-                $event->job->id = $event->id;
-            }
-        });
+        $this->on(static::EVENT_BEFORE_EXEC, [$this, 'handleBeforeExec']);
     }
 
-    /**
-     * @return array
-     */
-    public static function getAvailableProgressions(): array
+    public function handleBeforeExec(ExecEvent $event)
     {
-        return BaseProgression::getTypes();
-    }
-
-    /**
-     * @param RetryableJob $body
-     * @param AmqpProducer $producer
-     * @param AmqpMessage $newMessage
-     * @param int $attempt
-     * @throws ErrorException
-     * @throws \Interop\Queue\DeliveryDelayNotSupportedException
-     */
-    public function processDelay(RetryableJob $body, AmqpProducer &$producer, AmqpMessage &$newMessage, int $attempt)
-    {
-        if ($retryDelay = $body->retryDelay) {
-            $retryDelay = ceil($this->calculateRetryDelay($body->retryProgression, $retryDelay, $attempt));
-            $newMessage->setProperty(static::DELAY, $retryDelay);
-            $producer->setDeliveryDelay($retryDelay * ($this->microseconds ? 1 : 1000));
+        if ($event->job instanceof RetryableJob) {
+            $event->job->id = $event->id;
         }
-    }
-
-    public static function calculateRetryDelay($progression, $delay, $attempt)
-    {
-        $class = ArrayHelper::getValue(static::getAvailableProgressions(), $progression);
-        if (!$class) {
-            throw new ErrorException("progression $progression not available");
-        }
-        return $class::calculate($delay, $attempt);
     }
 
     public function count()
@@ -73,6 +42,11 @@ class Queue extends BaseQueue
         $queue->addFlag(AmqpQueue::FLAG_DURABLE);
         $queue->setArguments(['x-max-priority' => $this->maxPriority]);
         return $this->context->declareQueue($queue);
+    }
+
+    protected function redeliver(AmqpMessage $message)
+    {
+        $this->redeliverToQueue($message, $this->queueName);
     }
 
     /**
@@ -90,10 +64,11 @@ class Queue extends BaseQueue
         $body = $this->serializer->unserialize($message->getBody());
         if ($body instanceof RetryableJob) {
             $body->currentAttempt = $attempt + 1;
+            $body->previousId = $message->getMessageId();
         }
         $newMessage = $this->context->createMessage(
             $this->serializer->serialize($body),
-            ArrayHelper::merge($message->getProperties(), ['previousId' => $message->getMessageId()]),
+            $message->getProperties(),
             $message->getHeaders()
         );
         $newMessage->setDeliveryMode($message->getDeliveryMode());
@@ -106,5 +81,39 @@ class Queue extends BaseQueue
             $this->context->createQueue($queueName),
             $newMessage
         );
+    }
+
+    /**
+     * @param RetryableJob $body
+     * @param AmqpProducer $producer
+     * @param AmqpMessage $newMessage
+     * @param int $attempt
+     * @throws ErrorException
+     * @throws \Interop\Queue\DeliveryDelayNotSupportedException
+     */
+    public function processDelay(RetryableJob $body, AmqpProducer &$producer, AmqpMessage &$newMessage, int $attempt)
+    {
+        if ($retryDelay = $body->retryDelay) {
+            $retryDelay = $this->calculateRetryDelay($body->retryProgression, $retryDelay, $attempt);
+            $newMessage->setProperty(static::DELAY, $retryDelay);
+            $producer->setDeliveryDelay($retryDelay * ($this->microseconds ? 1 : 1000));
+        }
+    }
+
+    public static function calculateRetryDelay($progression, $delay, $attempt)
+    {
+        $class = ArrayHelper::getValue(static::getAvailableProgressions(), $progression);
+        if (!$class) {
+            throw new ErrorException("progression $progression not available");
+        }
+        return $class::calculate($delay, $attempt);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAvailableProgressions(): array
+    {
+        return BaseProgression::getClassesByName();
     }
 }
