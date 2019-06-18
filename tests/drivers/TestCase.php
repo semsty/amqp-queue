@@ -3,13 +3,12 @@
 namespace tests\drivers;
 
 use Yii;
-use yii\queue\Queue;
 
 abstract class TestCase extends \tests\TestCase
 {
     abstract protected function getQueue();
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach (glob(Yii::getAlias("@runtime/job-*.lock")) as $fileName) {
             unlink($fileName);
