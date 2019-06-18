@@ -18,6 +18,7 @@ RUN apt-get update \
     && apt-get install -y libpq-dev \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo_pgsql \
+    && docker-php-ext-install sockets \
     && apt-get -y install libgearman-dev \
     && TMPDIR=$(mktemp -d) \
     && cd $TMPDIR \
