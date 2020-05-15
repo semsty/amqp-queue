@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=7.2.0",
-        "yiisoft/yii2": "2.0.20",
+        "yiisoft/yii2": ">=2.0.20",
         "php-amqplib/php-amqplib": "*",
         "enqueue/amqp-lib": "^0.8",
         "yiisoft/yii2-queue": "2.0.2"
