@@ -31,7 +31,7 @@ class QueueTest extends CliTestCase
         $job->push('amqpInteropQueue');
 
         sleep(6);
-        $this->assertFileNotExists($job->getFileName());
+        $this->assertFileDoesNotExist($job->getFileName());
 
         sleep(10);
         $this->assertFileExists($job->getFileName());
