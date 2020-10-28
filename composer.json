@@ -10,15 +10,16 @@
         }
     ],
     "require": {
-        "php": ">=7.2.0",
-        "yiisoft/yii2": ">=2.0.20",
+        "php": ">=7.3.0",
+        "yiisoft/yii2": "2.0.38",
+        "yiisoft/yii2-queue": "2.3.0",
         "php-amqplib/php-amqplib": "*",
         "enqueue/amqp-lib": "^0.8",
-        "yiisoft/yii2-queue": ">=2.0.2"
+        "ext-sockets": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "8.2.2",
-        "yiisoft/yii2-shell": "2.0.2"
+        "phpunit/phpunit": "9.4.2",
+        "yiisoft/yii2-shell": "2.0.4"
     },
     "config": {
         "process-timeout": 1800
@@ -33,5 +34,8 @@
         "psr-4": {
             "semsty\\amqp\\": "src"
         }
+    },
+    "scripts": {
+        "post-install-cmd": ""
     }
 }
