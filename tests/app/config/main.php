@@ -6,6 +6,9 @@ $config = [
     'bootstrap' => [
         'amqpInteropQueue'
     ],
+    'controllerMap' => [
+        'shell' => 'yii\shell\ShellController'
+    ],
     'components' => [
         'amqpInteropQueue' => [
             'class' => \semsty\amqp\Queue::class,

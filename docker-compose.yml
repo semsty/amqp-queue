@@ -1,15 +1,15 @@
 version: "2"
 services:
-  php72:
+  php73:
     build:
       context: .
-      dockerfile: tests/app/docker/php/7.2/Dockerfile
+      dockerfile: tests/app/docker/php/7.3/Dockerfile
     command: ["sleep", "infinity"]
     dns:
       - 8.8.8.8
       - 4.4.4.4
     volumes:
-      - .:/code
+      - .:/app
       - ./tests/app/runtime/composer:/root/.composer
     environment:
       RABBITMQ_HOST: rabbitmq
